@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Moderna</title>
+    <!-- Tailwind CSS for modern layout and utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom smooth click animation and tactile feedback */
+        .calc-btn {
+            transition: all 0.1s ease-in-out;
+        }
+        .calc-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-sm bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl shadow-2xl overflow-hidden p-6">
+        
+        <!-- App Title Header -->
+        <div class="flex justify-between items-center mb-4 px-1">
+            <span class="text-slate-400 text-xs font-semibold tracking-wider uppercase">Calculadora</span>
+            <div class="flex space-x-1.5">
+                <div class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+            </div>
+        </div>
+
+        <div class="bg-slate-950/60 border border-slate-700/40 rounded-2xl p-4 mb-6 text-right shadow-inner flex flex-col justify-end min-h-[96px]">
+            <!-- Previous expression tracker -->
+            <div id="previous-operand" class="text-slate-400 text-sm font-medium tracking-wide h-6 overflow-hidden text-ellipsis"></div>
+            <!-- Current active input display -->
+            <div id="current-operand" class="text-white text-3xl sm:text-4xl font-bold tracking-tight overflow-hidden text-ellipsis">0</div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3">
+            <!-- Row 1 -->
+            <button onclick="clearDisplay()" class="calc-btn col-span-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-semibold py-3.5 rounded-xl border border-rose-500/20 transition">AC</button>
+            <button onclick="deleteDigit()" class="calc-btn bg-slate-700/50 hover:bg-slate-700 text-slate-300 font-semibold py-3.5 rounded-xl border border-slate-600/30 transition">⌫</button>
+            <button onclick="appendOperator('/')" class="calc-btn bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 font-semibold py-3.5 rounded-xl border border-indigo-500/30 transition">÷</button>
+
+            <!-- Row 2 -->
+            <button onclick="appendNumber('7')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">7</button>
+            <button onclick="appendNumber('8')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">8</button>
+            <button onclick="appendNumber('9')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">9</button>
+            <button onclick="appendOperator('*')" class="calc-btn bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 font-semibold py-3.5 rounded-xl border border-indigo-500/30 transition">×</button>
+
+            <!-- Row 3 -->
+            <button onclick="appendNumber('4')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">4</button>
+            <button onclick="appendNumber('5')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">5</button>
+            <button onclick="appendNumber('6')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">6</button>
+            <button onclick="appendOperator('-')" class="calc-btn bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 font-semibold py-3.5 rounded-xl border border-indigo-500/30 transition">-</button>
+
+            <!-- Row 4 -->
+            <button onclick="appendNumber('1')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">1</button>
+            <button onclick="appendNumber('2')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">2</button>
+            <button onclick="appendNumber('3')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">3</button>
+            <button onclick="appendOperator('+')" class="calc-btn bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 font-semibold py-3.5 rounded-xl border border-indigo-500/30 transition">+</button>
+
+            <!-- Row 5 -->
+            <button onclick="appendNumber('0')" class="calc-btn col-span-2 bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">0</button>
+            <button onclick="appendDecimal('.')" class="calc-btn bg-slate-700/30 hover:bg-slate-700/60 text-white font-medium py-3.5 rounded-xl border border-slate-600/20 transition">.</button>
+            <button onclick="compute()" class="calc-btn bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition">=</button>
+        </div>
+
+    </div>
+
+    <script>
+        // State variables for calculation logic
+        let currentOperand = '0';
+        let previousOperand = '';
+        let operation = null;
+        let resetScreen = false;
+
+        const currentOperandElement = document.getElementById('current-operand');
+        const previousOperandElement = document.getElementById('previous-operand');
+
+        // Function to handle number buttons input
+        function appendNumber(number) {
+            if (currentOperand === '0' || resetScreen) {
+                currentOperand = number;
+                resetScreen = false;
+            } else {
+                currentOperand += number;
+            }
+            updateDisplay();
+        }
+
+        // Function to handle decimal points safely
+        function appendDecimal(dot) {
+            if (resetScreen) {
+                currentOperand = '0';
+                resetScreen = false;
+            }
+            if (!currentOperand.includes('.')) {
+                currentOperand += dot;
+            }
+            updateDisplay();
+        }
+
+        // Function to handle basic operations (+, -, *, /)
+        function appendOperator(op) {
+            if (operation !== null) compute();
+            previousOperand = currentOperand + ' ' + op;
+            operation = op;
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        // Function to compute results safely
+        function compute() {
+            let computation;
+            const prev = parseFloat(previousOperand);
+            const current = parseFloat(currentOperand);
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operation) {
+                case '+':
+                    computation = prev + current;
+                    break;
+                case '-':
+                    computation = prev - current;
+                    break;
+                case '*':
+                    computation = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        showErrorMsg("No se puede dividir por cero");
+                        clearDisplay();
+                        return;
+                    }
+                    computation = prev / current;
+                    break;
+                default:
+                    return;
+            }
+
+            currentOperand = Math.round(computation * 100000000) / 100000000;
+            operation = null;
+            previousOperand = '';
+            resetScreen = true;
+            updateDisplay();
+        }
+
+        // Clear all calculator data
+        function clearDisplay() {
+            currentOperand = '0';
+            previousOperand = '';
+            operation = null;
+            updateDisplay();
+        }
+
+        // Delete last inputted character
+        function deleteDigit() {
+            if (currentOperand.length === 1 || resetScreen) {
+                currentOperand = '0';
+            } else {
+                currentOperand = currentOperand.slice(0, -1);
+            }
+            updateDisplay();
+        }
+
+        // Custom friendly message display instead of alert()
+        function showErrorMsg(msg) {
+            previousOperandElement.innerText = msg;
+            setTimeout(() => {
+                previousOperandElement.innerText = '';
+            }, 3000);
+        }
+
+        // Update UI screen elements
+        function updateDisplay() {
+            currentOperandElement.innerText = currentOperand;
+            previousOperandElement.innerText = previousOperand;
+        }
+
+        // Keyboard event listeners for computer usability
+        window.addEventListener('keydown', e => {
+            if ((e.key >= 0 && e.key <= 9)) appendNumber(e.key);
+            if (e.key === '.') appendDecimal('.');
+            if (e.key === '=' || e.key === 'Enter') compute();
+            if (e.key === 'Backspace') deleteDigit();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') appendOperator(e.key);
+        });
+    </script>
+</body>
+</html>
